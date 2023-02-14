@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ee181457-51f5-43cf-b324-b3dc80764cf2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="8036c671-c678-4b6b-8e86-366c9d7e4157" >
+		<file:connection workingDir="D:\" />
+	</file:config>
+	<flow name="jsontocsvFlow" doc:id="3b53ce04-a1cc-4ff5-883b-8daa76a9c32c" >
+		<http:listener doc:name="JSON to CSV" doc:id="b9c02d8f-9cca-452c-a750-22aeac86400e" config-ref="HTTP_Listener_config" path="/jsontocsv"/>
+		<ee:transform doc:name="Transform Message" doc:id="bb6eda3f-62ec-4411-a7f4-d8f2951b523a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+payload.Employees map ( employee , indexOfEmployee ) -> {
+	EID: employee.EmpID,
+	Name: employee.EmpName,
+	Designation: employee.EmpDesignation
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7357381a-083c-459c-897b-160746fe5c8b" message="#[payload]"/>
+		<file:write doc:name="Write" doc:id="ae64a733-b904-4bea-a797-9a310ee10abf" config-ref="File_Config" path="/jsontocsvdata.csv"/>
+	</flow>
+</mule>

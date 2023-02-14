@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="json" format="json">
+      <types:shape format="weave" example="examples/emp.json"><![CDATA[%dw 2.0
+
+type json = {|
+  Employees: Array<{|    EmpID: String,     EmpName: String,     EmpDesignation: String  |}>
+|} {"example": "{\\\"Employees\\\":[{\\\"EmpID\\\":\\\"12\\\",\\\"EmpName\\\":\\\"Aritra\\\",\\\"EmpDesignation\\\":\\\"A\\\"},{\\\"EmpID\\\":\\\"13\\\",\\\"EmpName\\\":\\\"Amit\\\",\\\"EmpDesignation\\\":\\\"A\\\"},{\\\"EmpID\\\":\\\"14\\\",\\\"EmpName\\\":\\\"Chavan\\\",\\\"EmpDesignation\\\":\\\"A\\\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="csv" format="csv">
+      <types:shape format="weave" example="examples/empdata.csv"><![CDATA[%dw 2.0
+
+type csv = Array<{|  EID: String,   Name: String,   Designation: String|}> {"isQuotedString": "false",
+"header": "true",
+"headerLineNumber": "0"}
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+      </types:properties>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#bb6eda3f-62ec-4411-a7f4-d8f2951b523a">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="csv"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
